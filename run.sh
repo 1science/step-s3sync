@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo pip install -r $WERCKER_STEP_ROOT/requirements.txt
+
 set_auth() {
   local s3cnf="$HOME/.s3cfg"
 
@@ -54,7 +56,7 @@ main() {
   fi
 
   set +e
-  local SYNC="$WERCKER_STEP_ROOT/s3cmd sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED --verbose ./ $WERCKER_S3SYNC_BUCKET_URL"
+  local SYNC="$WERCKER_STEP_ROOT/aws s3 sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED --verbose ./ $WERCKER_S3SYNC_BUCKET_URL"
   debug "$SYNC"
   local sync_output=$($SYNC)
 
