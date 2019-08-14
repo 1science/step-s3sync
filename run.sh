@@ -1,17 +1,13 @@
 #!/bin/bash
 
+sudo pip install -r $WERCKER_STEP_ROOT/requirements.txt
+
 set_auth() {
-  local s3cnf="$HOME/.s3cfg"
 
-  if [ -e "$s3cnf" ]; then
-    warn '.s3cfg file already exists in home directory and will be overwritten'
-  fi
-
-  echo '[default]' > "$s3cnf"
-  echo "access_key=$WERCKER_S3SYNC_KEY_ID" >> "$s3cnf"
-  echo "secret_key=$WERCKER_S3SYNC_KEY_SECRET" >> "$s3cnf"
-
-  debug "generated .s3cfg for key $WERCKER_S3SYNC_KEY_ID"
+  export AWS_ACCESS_KEY_ID=$WERCKER_S3SYNC_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$WERCKER_S3SYNC_KEY_SECRET
+  debug "exported access key id and secret access key"
+#   debug "generated .s3cfg for key $WERCKER_S3SYNC_KEY_ID"
 }
 
 main() {
@@ -32,17 +28,17 @@ main() {
   fi
 
   if [ ! -n "$WERCKER_S3SYNC_OPTS" ]; then
-    export WERCKER_S3SYNC_OPTS="--acl-public"
+    export WERCKER_S3SYNC_OPTS="--acl public"
   fi
 
   if [ -n "$WERCKER_S3SYNC_DELETE_REMOVED" ]; then
       if [ "$WERCKER_S3SYNC_DELETE_REMOVED" = "true" ]; then
-          export WERCKER_S3SYNC_DELETE_REMOVED="--delete-removed"
+          export WERCKER_S3SYNC_DELETE_REMOVED="--delete"
       else
           unset WERCKER_S3SYNC_DELETE_REMOVED
       fi
   else
-      export WERCKER_S3SYNC_DELETE_REMOVED="--delete-removed"
+      export WERCKER_S3SYNC_DELETE_REMOVED="--delete"
   fi
 
   source_dir="$WERCKER_ROOT/$WERCKER_S3SYNC_SOURCE_DIR"
@@ -54,13 +50,13 @@ main() {
   fi
 
   set +e
-  local SYNC="$WERCKER_STEP_ROOT/s3cmd sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED --verbose ./ $WERCKER_S3SYNC_BUCKET_URL"
+  local SYNC="$WERCKER_STEP_ROOT/aws s3 sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED ./ $WERCKER_S3SYNC_BUCKET_URL"
   debug "$SYNC"
   local sync_output=$($SYNC)
 
   if [[ $? -ne 0 ]];then
       echo "$sync_output"
-      fail 's3cmd failed';
+      fail 'aws s3 failed';
   else
       echo "$sync_output"
       success 'finished s3 synchronisation';
