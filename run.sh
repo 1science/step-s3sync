@@ -3,17 +3,11 @@
 sudo pip install -r $WERCKER_STEP_ROOT/requirements.txt
 
 set_auth() {
-  local s3cnf="$HOME/.s3cfg"
 
-  if [ -e "$s3cnf" ]; then
-    warn '.s3cfg file already exists in home directory and will be overwritten'
-  fi
-
-  echo '[default]' > "$s3cnf"
-  echo "access_key=$WERCKER_S3SYNC_KEY_ID" >> "$s3cnf"
-  echo "secret_key=$WERCKER_S3SYNC_KEY_SECRET" >> "$s3cnf"
-
-  debug "generated .s3cfg for key $WERCKER_S3SYNC_KEY_ID"
+  export AWS_ACCESS_KEY_ID=$WERCKER_S3SYNC_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$WERCKER_S3SYNC_KEY_SECRET
+  debug "exported access key id and secret access key"
+#   debug "generated .s3cfg for key $WERCKER_S3SYNC_KEY_ID"
 }
 
 main() {
@@ -44,7 +38,7 @@ main() {
           unset WERCKER_S3SYNC_DELETE_REMOVED
       fi
   else
-      export WERCKER_S3SYNC_DELETE_REMOVED="--delete-removed"
+      export WERCKER_S3SYNC_DELETE_REMOVED="--delete"
   fi
 
   source_dir="$WERCKER_ROOT/$WERCKER_S3SYNC_SOURCE_DIR"
@@ -62,7 +56,7 @@ main() {
 
   if [[ $? -ne 0 ]];then
       echo "$sync_output"
-      fail 's3cmd failed';
+      fail 'aws s3 failed';
   else
       echo "$sync_output"
       success 'finished s3 synchronisation';
