@@ -10,7 +10,7 @@ It is recommended that you use application and deployment variables in wercker, 
 
 # What's new
 
-- Uses awscli instead of s3cmd
+- Always display s3cmd output
 
 # Options
 
@@ -80,9 +80,6 @@ It's a good idea to create a IAM user which just has enough permissions to be ab
 The MIT License (MIT)
 
 # Changelog
-
-## 3.0.0
-- Switch s3cmd to awscli
 
 ## 2.2.2
 
