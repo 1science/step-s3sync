@@ -34,12 +34,12 @@ main() {
   fi
 
   if [ ! -n "$WERCKER_S3SYNC_OPTS" ]; then
-    export WERCKER_S3SYNC_OPTS="--acl-public"
+    export WERCKER_S3SYNC_OPTS="--acl public"
   fi
 
   if [ -n "$WERCKER_S3SYNC_DELETE_REMOVED" ]; then
       if [ "$WERCKER_S3SYNC_DELETE_REMOVED" = "true" ]; then
-          export WERCKER_S3SYNC_DELETE_REMOVED="--delete-removed"
+          export WERCKER_S3SYNC_DELETE_REMOVED="--delete"
       else
           unset WERCKER_S3SYNC_DELETE_REMOVED
       fi
@@ -56,7 +56,7 @@ main() {
   fi
 
   set +e
-  local SYNC="$WERCKER_STEP_ROOT/aws s3 sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED --verbose ./ $WERCKER_S3SYNC_BUCKET_URL"
+  local SYNC="$WERCKER_STEP_ROOT/aws s3 sync $WERCKER_S3SYNC_OPTS $WERCKER_S3SYNC_DELETE_REMOVED ./ $WERCKER_S3SYNC_BUCKET_URL"
   debug "$SYNC"
   local sync_output=$($SYNC)
 
