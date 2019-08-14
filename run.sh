@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo pip install -r $WERCKER_STEP_ROOT/requirements.txt
+
 set_auth() {
   local s3cnf="$HOME/.s3cfg"
 
